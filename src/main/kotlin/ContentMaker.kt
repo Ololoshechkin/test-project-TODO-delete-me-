@@ -13,14 +13,19 @@ class ContentMaker: AbstractActor() {
     private val mediator = DistributedPubSub.get(context.system()).mediator()
     private var spamCnt = 0
 
-    override fun createReceive(): Receive = ReceiveBuilder.create()
+    init {
+        preStart()
+        scheduleWakeUp()
+    }
+
+    override fun createReceive(): Receive = ReceiveBuilder()
             .matchEquals("start", {
                 mediator.tell(DistributedPubSubMediator.Publish("content", "some new message"),
                 self)
                 scheduleWakeUp()
             }).matchEquals("spam", {
                 spamCnt++
-                if (spamCnt == 3) {
+                if (spamCnt >= 3) {
                     sender.tell("ban", self)
                 }
             })

@@ -13,11 +13,17 @@ class SpamMaker: AbstractActor() {
     private val mediator = DistributedPubSub.get(context.system()).mediator()
     private var spamCnt = 0
 
+    init {
+        preStart()
+        scheduleWakeUp()
+    }
+
     override fun createReceive(): Receive = ReceiveBuilder.create()
             .matchEquals("ban", {
-                mediator.tell(DistributedPubSubMediator.Unsubscribe("content", self()), self())
+                context().stop(self)
             }).matchEquals("spam more!", {
                 mediator.tell(DistributedPubSubMediator.Publish("content", "spam"), self)
+                scheduleWakeUp()
             })
             .build()
 

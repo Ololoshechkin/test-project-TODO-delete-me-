@@ -1,3 +1,4 @@
+import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.actor.PoisonPill
 import akka.actor.Props
@@ -8,22 +9,12 @@ import com.typesafe.config.ConfigFactory
 import scala.Option
 
 fun main(args: Array<String>) {
-    val actorSystem = ActorSystem.create("SystemCluster", ConfigFactory.load().getConfig("SystemCluster"))
+    val actorSystem = ActorSystem.create("ClusterExample")
 
     val settings = ClusterSingletonManagerSettings.create(actorSystem)
     actorSystem.actorOf(ClusterSingletonManager.props(
             Props.create(ContentMaker::class.java),
-            "master",
+            PoisonPill.getInstance(),
             settings
-    ),
-    "master")
-
-    actorSystem.actorOf(
-            RandomPool(5).props(Props.create(ContentSubscriber::class.java)),
-            "user"
-    )
-    actorSystem.actorOf(
-            Props.create(SpamMaker::class.java),
-            "spammer"
-    )
+    ), "singleton")
 }

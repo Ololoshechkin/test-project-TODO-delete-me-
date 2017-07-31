@@ -9,7 +9,7 @@ import scala.runtime.BoxedUnit
 class ContentSubscriber : AbstractActor() {
     override fun createReceive(): Receive = ReceiveBuilder.create()
             .match(String::class.java, {
-                log.debug("subscriber received message : $it")
+                println("got : $it")
             })
             .build()
 
