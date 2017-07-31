@@ -1,0 +1,56 @@
+group 'com.JetBrains.ReferenceTo'
+version '1.0-SNAPSHOT'
+
+
+buildscript {
+    ext.kotlin_version = '1.1.2-2'
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'scala'
+apply plugin: 'antlr'
+
+def scalaMajor = "2.11"
+def akkaVersion = "2.5.3"
+def scalaVerForCluster = "2.10"
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile (
+            ["org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"],
+            [group: 'com.typesafe.akka', name: "akka-remote_$scalaMajor", version: akkaVersion],
+            [group: 'com.typesafe.akka', name: "akka-cluster_$scalaMajor", version: akkaVersion],
+            [group: 'com.typesafe.akka', name: "akka-contrib_$scalaMajor", version: akkaVersion])
+    antlr "org.antlr:antlr4:4.5.3"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+generateGrammarSource {
+    maxHeapSize = "4g"
+    arguments += ["-visitor", "-long-messages"]
+    outputDirectory = new File("generated-src/antlr/main/antlr.generated".toString())
+}
+
+task showMeCache << {
+    configurations.compile.each { println it }
+}
+
+//task copylibs(type: Copy) {
+//    //referring to the 'compile' configuration
+//    from configurations.compile, configurations.testCompile
+//    into 'libs'
+//}
