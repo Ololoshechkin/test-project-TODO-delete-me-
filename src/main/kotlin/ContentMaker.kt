@@ -29,6 +29,9 @@ class ContentMaker: AbstractActor() {
                     sender.tell("ban", self)
                 }
             })
+            .matchEquals(1, { _ ->
+                println("FOT")
+            })
             .build()
 
     override fun preStart() {
